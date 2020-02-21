@@ -171,6 +171,38 @@ class SmallNORBDataset:
 
 			print('Done.')
 
+	def export_to_jpg_3(self, export_dir):
+
+		if self.initialized:
+			print('Exporting images to {}...'.format(export_dir), end='', flush=True)
+
+			if exists(export_dir):
+				rmtree(export_dir)
+			makedirs(export_dir)
+
+			for split_name in ['train', 'test']:
+
+				for _, norb_example in enumerate(tqdm(self.data[split_name])):
+
+					category = norb_example.category
+					instance = norb_example.instance
+					
+					cat_ins_dir = join(export_dir, str(category), str(instance))
+					if not exists(cat_ins_dir):
+						makedirs(cat_ins_dir)
+					
+					azimuth = norb_example.azimuth
+					elevation = norb_example.elevation
+					lighting = norb_example.lighting
+
+					image_lt_path = join(cat_ins_dir, 'azimuth{:02d}_elevation{:01d}_lighting{:01d}_lt.png'.format(azimuth, elevation, lighting))
+					image_rt_path = join(cat_ins_dir, 'azimuth{:02d}_elevation{:01d}_lighting{:01d}_rt.png'.format(azimuth, elevation, lighting))
+
+					scipy.misc.imsave(image_lt_path, norb_example.image_lt)
+					scipy.misc.imsave(image_rt_path, norb_example.image_rt)
+
+			print('Done.')
+
 	def group_dataset_by_category_and_instance(self, dataset_split):
 		"""
 		Group small NORB dataset for (category, instance) key
